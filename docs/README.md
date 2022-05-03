@@ -1,0 +1,17 @@
+# 终端广域接口
+
+1. 本协议（PDF版本时）文档可能不是最新版本；
+
+2. 本协议文档描述，终端局域广播接口；
+
+3. 开发者若需要硬件对接请联系销售人员,  https://www.imyfit.com ；
+
+4. 若协议文档有更新，不再另行通知，强烈建议开发者到 https://imyfit.gitee.io 获取在线最新协议；
+
+5. 若对协议不理解或发现协议有bug请到issues区域提出（或者提交一个 pull request），愿我们的付出对您的开发事半功倍。
+
+
+
+## Part1.[NB-IoT终端API](./NB-IoT终端API.md) 
+
+## Part2.[Cat_1终端API](./Cat_1终端API.md) 
