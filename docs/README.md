@@ -14,4 +14,4 @@
 
 ## Part1.[NB-IoT终端API](./NB-IoT终端API.md) 
 
-## Part2.[Cat.1终端API](./Cat.1终端API.md) 
+## Part2.[Cat.1终端API](./Cat_1终端API.md) 
