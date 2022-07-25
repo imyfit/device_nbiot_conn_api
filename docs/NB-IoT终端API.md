@@ -9,7 +9,7 @@
 2. 本协议文档描述，NB-IoT终端API；
 3. 开发者若需要硬件对接请联系销售人员,  https://www.imyfit.com ；
 4. 若协议文档有更新，不再另行通知，强烈建议开发者到 https://imyfit.gitee.io 获取在线最新协议；
-5. 若对协议不理解或发现协议有bug请到issues区域提出（或者提交一个 pull request），愿我们的付出对您的开发事半功倍。
+5. 若有疑问请到ISSUE区提出 https://gitee.com/imyfit/imyfit-issue 愿我们的付出对您的开发事半功倍。
 
 ## 1.概述
 
