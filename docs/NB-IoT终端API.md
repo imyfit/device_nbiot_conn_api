@@ -6,6 +6,7 @@
 |   2.22   | 20220721 | 1. 短消息增加标题                                            |
 |   2.23   | 20220803 | 1.增加NB上报参数配置 <br />2.完善GPS参数配置 <br />3.完善蓝牙扫描参数配置 |
 |   2.24   | 20220817 | 完善GPS配置，增加定位成功延时关闭，定位数据上报间隔，定位数据过滤时间三个参数 |
+|   2.25   | 20220824 | 1. 增加统一的WIFI扫描配置<br />2. 去掉之前的WIFI和FENCE配置  |
 
 1. 本协议文档可能不是最新版本；
 2. 本协议文档描述，NB-IoT终端API；
@@ -326,47 +327,7 @@ NB-IoT通信的终端并不是一直处于接收数据状态，终端有数据�
 
  <u>**注意：此设置不做存储，重启后需要重新设定**</u>
 
-#### 5.Wi-Fi定位配置（NB终端）
-
-用于配置Wi-Fi定位的开关，时间间隔等。
-
-**设置：**
-
-表格 22 Wi-Fi定位配置
-
-|  **键**  | **类型** | **含义**                                                     |
-| :------: | :------: | ------------------------------------------------------------ |
-| setWifi  |  string  | open：打开，close：关闭，为空则查询。                        |
-| interval |  string  | 时间间隔，需大于60，单位秒，不设置则为当前已设置间隔时间）。 |
-|   dev    |  string  | msgid，mac                                                   |
-
-**响应：**
-
-表格 23手环响应Wi-Fi定位配置
-
-|   **键**   | **类型** | **含义**                                                     |
-| :--------: | :------: | ------------------------------------------------------------ |
-| acksetWifi |  string  | open：打开，close：关闭                                      |
-|  interval  |  string  | 时间间隔，需大于60，单位秒，不设置则为当前已设置间隔时间）。 |
-|    dev     |  string  | msgid，mac                                                   |
-
-```json
-示例：
-设置：
-{"setWifi":"","dev":"1566197383,8cd49500fffe"}
-响应：
-{"acksetWifi":"open","interval":"60","dev":"1566197383,8cd49500fffe"}
-设置：
-{"setWifi":"close","dev":"1566197383,8cd49500fffe"}
-响应：
-{"acksetWifi":"close","interval":"60","dev":"1566197383,8cd49500fffe"}
-设置：
-{"setWifi":"open","dev":"1566197383,8cd49500fffe"}
-响应：
-{"acksetWifi":"open","interval":"60","dev":"1566197383,8cd49500fffe"}
-```
-
-#### 6.系统参数设置接口
+#### 5.系统参数设置接口
 
 **设置：**
 
@@ -408,11 +369,11 @@ NB-IoT通信的终端并不是一直处于接收数据状态，终端有数据�
 |     bp_execption      |     血压异常     |                          open/close                          | 收缩压预警最小值和最大值，舒张压预警最小值和最大值。中间用‘,’隔开。 |
 |       diagnosis       |     诊断监测     |                          open/close                          | 连续监测间隔时间【分钟】，默认值5，可修改为5的倍数，最大60   |
 |        remind         |    自定义提醒    |     自定义提醒总数+本数据包提醒数量。<br />中间逗号隔开      | 16进制字符串【解析请先将两个字节转换位一个16进制数】，删除时发送编号即可。  数据结构参考提醒参数表 |
-|         fence         |  Wi-Fi围栏功能   |               用一个字节表示7个围栏的开关状态                | 最多可以跟7个围栏数据  围栏数据参考围栏参数表  设置的时候如果后面没有跟数据，则使用系统数据，系统没有数据，则报错 |
 |          hrv          |     Hrv监测      |                          open/close                          | 连续监测间隔时间【分钟】，默认值5，可修改为5的倍数，最大60   |
-|        btscan         | 蓝牙扫描功能设置 | “scan_switch,<br />fence_switch,<br />flag,<br />period,<br />config_period,<br />timeout,<br />filter_name,<br />filter_rssi,<br />in_period, <br />out_period"<br />具体内容参考：  蓝牙扫描设置state参数表 | BT围栏数据  数据同fence                                      |
+|        btscan         | 蓝牙扫描功能设置 | “scan_switch,<br />fence_switch,<br />flag,<br />period,<br />config_period,<br />timeout,<br />filter_name,<br />filter_rssi,<br />in_period, <br />out_period"<br />具体内容参考：  蓝牙扫描设置state参数表 | BT围栏数据  最多可以跟7个围栏数据  围栏数据参考围栏参数表    |
 |       nb_config       |    NB上报控制    |                              无                              | 16进制字符串【解析请先将两个字节转换位一个16进制数】具体内容参考NB配置参数表 |
 |     adv_frequency     | 广播间隔时间设置 |                              无                              | “广播间隔，静止广播间隔，SOS广播间隔”<br />单位10ms   默认"33,100,33" |
+|       wifiscan        |   WIFI扫描配置   | “scan_switch,<br />fence_switch,<br />flag,<br />period,<br />config_period,<br />in_period, <br />out_period"<br />具体内容参考：  WiFi扫描设置state参数表 | 最多可以跟7个围栏数据  围栏数据参考围栏参数表                |
 
 表格 27NB上报配置参数表
 
