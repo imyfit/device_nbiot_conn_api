@@ -11,6 +11,7 @@
 |   2.27   | 20221017 | 运动事件增加sport2[增加里程，最大心率，平均心率]             |
 |   2.28   | 20230310 | 1. 优化对各机型差异的说明<br />2. 纠错                       |
 |   2.29   | 20230315 | 1. 定时上报信息增加基站信息<br />2. WIFI信息上报增加基站信息 |
+|   2.30   | 20230321 | 更正充电事件参数问题                                         |
 
 1. 本协议文档可能不是最新版本；
 2. 本协议文档描述，Cat1&NB-Iot终端API；
@@ -932,7 +933,7 @@ HRV记录5个参数
 | LocationData |  string  | 上报最新的定位信息[sos，fall_alarm，manual_gps事件有该字段]格式参考1.4.7 |
 |  manual_gps  |   int    | 请求定位时间[manual_gps字段]                                 |
 |  sport_cwm   |  string  | CWM运动事件数据参看CWM运动数据表【运动事件才有这个字段】【CWM运动事件字段】 |
-|    charge    |  string  | 充电状态<br />  "charge_status,charge_in_time,charge_full_time,charge_out_time"<br />   charge_status:<br />   0x01-插入充电器 0x02-开始充电 0x04-结束充电<br />   0x08-充满电 0x10-拔掉充电器 |
+|    charge    |  string  | 充电状态<br />  "charge_status,charge_in_time, charge_start_time, charge_end_time, charge_full_time,charge_out_time"<br />   charge_status:<br />   0x01-插入充电器 0x02-开始充电 0x04-结束充电<br />   0x08-充满电 0x10-拔掉充电器<br />**0x02和0x04状态未使用，charge_start_time和charge_end_time未使用** |
 
 ```json
 示例：
