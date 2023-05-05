@@ -177,6 +177,8 @@ MQTT协议主题格式约定：类型/接收方/发送方/，具体主题如下�
 |       cell_id       |  string  | Service-cell Identify：小区识别码                            |
 |       mcc+mnc       |  string  | Mobile Country Code：移动信号国家码 + Mobile Network Code：移动设备网络代码 |
 |      net_mode       |  string  | 网络模式                                                     |
+|       stress        |   int    | 情绪压力值 0~100，值越大表示压力越大                         |
+|       fatigue       |   int    | 疲劳度值 0~100，值越大表示越疲劳                             |
 
 表格 8 心理健康测评指标表
 
