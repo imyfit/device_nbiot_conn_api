@@ -256,9 +256,9 @@ MQTT协议主题格式约定：类型/接收方/发送方/，具体主题如下�
 ```json
 示例：
 只修改设置服务器和端口
-{"mqttConfiguration":{"host":"114.116.23.249","port":"1883"},"dev":"1566197383,8cd49500fffe"}
+{"mqttConfiguration":{"host":"mqtest.imyfit.com","port":"1883"},"dev":"1566197383,8cd49500fffe"}
 响应：
-{"mqttConfiguration":{"host":"114.116.23.249","port":1883,"clientId":"C460046645709170","qos":1,"retained":0,"topicPublisher":"dev/cloud/E35DC73E730D","topicSubscribe":"dev/E35DC73E730D/cloud","userName":"","userPasswrd":""},"dev"**:**"1566197383,8cd49500fffe"}
+{"mqttConfiguration":{"host":"mqtest.imyfit.com","port":1883,"clientId":"C460046645709170","qos":1,"retained":0,"topicPublisher":"dev/cloud/E35DC73E730D","topicSubscribe":"dev/E35DC73E730D/cloud","userName":"","userPasswrd":""},"dev"**:**"1566197383,8cd49500fffe"}
 ```
 
 #### 4.3.2 自动校准时间
