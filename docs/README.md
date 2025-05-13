@@ -20,6 +20,7 @@
 |   2.36   | 20231017 | 1. 纠错，GPS里面flags更新<br />2. 蓝牙主机扫描参数范围修改   |
 |   2.37   | 20250106 | 1. 4.1定时上报数据增加附近小区信息<br />2. 4.7定位相关协议增加定位类型05 |
 |   2.38   | 20250413 | 1. 3.1增加时区配置<br />2. 4.6增加sim卡插入事件<br />3. 增加A类终端， B类终端说明<br />4. 优化心率实时监测上报 |
+|   2.39   | 20250513 | 1. 4.1定时信息上报增加抗压能力和调节能力上报                 |
 
 1. 本协议文档可能不是最新版本；
 2. 本协议文档描述，Cat1&NB-Iot终端API；
@@ -192,8 +193,10 @@ B类终端设备一直在线
 |       cell_id       |  string  | Service-cell Identify：小区识别码                            |
 |       mcc+mnc       |  string  | Mobile Country Code：移动信号国家码 + Mobile Network Code：移动设备网络代码 |
 |      net_mode       |  string  | 网络模式                                                     |
-|       stress        |   int    | 情绪压力值 0~100，值越大表示压力越大                         |
+|       stress        |   int    | 精神压力值 0~100，值越大表示压力越大                         |
 |       fatigue       |   int    | 疲劳度值 0~100，值越大表示越疲劳                             |
+|     stress_res      |   int    | 抗压能力0~100，值越大越好                                    |
+|     adj_ability     |   int    | 调节能力0~100，值越大越好                                    |
 |   adjacent_cells    |  array   | ["string1","string2",...]<br />string1: "lac,cell_id,mcc-mnc" |
 
 表格 8 心理健康测评指标表
