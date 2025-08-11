@@ -1362,7 +1362,7 @@ https://lbs.amap.com/demo/jsapi-v2/example/other-gaode/othertoamap
 | 键   | 类型   | 含义                                                         |
 | ---- | ------ | ------------------------------------------------------------ |
 | func | string | 1. ota: 终端APP部分升级[注意不能升级UI]<br />2. ota_modem: 模组升级 |
-| url  | string | 升级文件下载路径                                             |
+| url  | string | 升级文件下载路径<br />注意： ota升级中文件名要求格式为ota_va.b.c.d.bin |
 | type | int    | ota_modem升级有效字段<br />a. 归芯模组 0: 差分升级 8: APP部分升级<br />b. 吾爱模组 0: 差分升级 |
 | md5  | string | ota升级有效字段 升级文件MD5校验码                            |
 | size | int    | ota升级有效字段 升级文件大小                                 |
