@@ -22,6 +22,7 @@
 |   2.38   | 20250413 | 1. 3.1增加时区配置<br />2. 4.6增加sim卡插入事件<br />3. 增加A类终端， B类终端说明<br />4. 优化心率实时监测上报 |
 |   2.39   | 20250513 | 1. 4.1定时信息上报增加抗压能力和调节能力上报                 |
 |   2.40   | 20250811 | 1. 增加OTA升级协议<br />2. 增加系统参数设置接口--远程上报配置slim<br />3. 系统参数设置接口--蓝牙扫描功能设置增加控制参数 |
+|   2.41   | 20260203 | 1.对部分现有数据上报接口的字段定义或传输格式进行了优化，提升了通信效率与稳定性。<br />2.为适应新硬件特性，扩展了部分系统参数配置项的取值或含义。<br />3.修正了前期版本中已知的问题，提升协议的整体可靠性。 |
 
 1. 本协议文档可能不是最新版本；
 2. 本协议文档描述，Cat1&NB-Iot终端API；
@@ -73,7 +74,7 @@ B类终端设备一直在线
 
 示例：
 
-```
+```json
 {"SENSOR_ERROR": 1008}
 ```
 
@@ -99,9 +100,10 @@ B类终端设备一直在线
 |     *timeZone     |   int    | 时区，默认为8                          |
 | *auto_calibration |   int    | 1开启，0关闭 默认开启                  |
 
+```json
 示例：
-
-**{**"setTime"**:**"1566197383,8cd49500fffe,20180910T120530","timeZone":8**}**
+{"setTime":"1768478610,50C0F0A29D1D,20260115T120330","timeZone":8,"auto_calibration":0}
+```
 
 表格 4 时间设置应答
 
@@ -111,32 +113,33 @@ B类终端设备一直在线
 |     *timeZone     |   int    | 时区                          |
 | *auto_calibration |   int    | 1开启，0关闭 默认开启         |
 
+```json
 示例：
-
-**{**"ackSetTime"**:**"1566197383,8cd49500fffe,20180910T120530","timeZone":8**}**
+{"ackSetTime":"1768478610,50C0F0A29D1D,20260115T120330","timeZone":8,"auto_calibration":0}
+```
 
 ### 3.2 终端消息发送
 
 表格 5 发送消息
 
 | **键**  | **类型** | **含义**                                                     |
-| ------- | -------- | ------------------------------------------------------------ |
-| title   | string   | 短消息标题。内容格式和短消息内容的格式一致，不包含 ’msg-‘ 部分。无此键则默认标题为"Server"。长度限制32字节，一个中文为3字节，英文字符为1个字节。 |
-| sendMsg | string   | “时间戳, 设备MAC, 消息”<br />向终端发送短消息，msg表示短消息，尖括号‘<>’括起来的为ASIIC格式的utf-8码。 |
-| type    | int      | 范围：241-254<br />254[0xFE]：其他<br />253[0xFD]：系统下发消息<br />252[0xFC]：系统下发消息[立即显示]<br />251[0xFB]：APP下发消息<br />250[0xFA]：APP下发消息[立即显示]<br />249[0xF9]：清除设备所有消息，设备重启<br />241-248：预留备用<br />**注意：没有该字段则识别为254其他** |
-| dev     | string   | msgid，mac                                                   |
+| :-----: | :------: | ------------------------------------------------------------ |
+|  title  |  string  | 短消息标题。内容格式和短消息内容的格式一致，不包含 ’msg-‘ 部分。无此键则默认标题为"Server"。长度限制32字节，一个中文为3字节，英文字符为1个字节。 |
+| sendMsg |  string  | “时间戳, 设备MAC, 消息”<br />向终端发送短消息，msg表示短消息，尖括号‘<>’括起来的为ASIIC格式的utf-8码。 |
+|   dev   |  string  | msgid，mac                                                   |
 
+```json
 示例1：
-
-发送短消息：“hello word!你好世界”，中文使用utf-8编码并转为ASIIC格式且用尖括号括起来。
-
-**{** "sendMsg":"1566197383,e35dc73e730d,msg-hello word !<E4BDA0E5A5BDE4B896E7958C>","dev"**:**"1566197383,8cd49500fffe" **}**
+中文部分需要转化为utf-8编码，再将utf-8编码变为ASIIC格式并放入尖括号内。
+{"title":"<E4BDA0E5A5BD>","sendMsg":"msg-hello word !"}
+消息标题：你好
+消息内容：hello word !
 
 示例2：
-
-发送标题为”通知“的短消息：“这是一条通知。”，中文使用utf-8编码并转为ASIIC格式且用尖括号括起来。
-
-**{**"sendMsg":"1657728358,c3ae93e507c2,msg-<e8bf99e698afe4b880e69da1e6b688e681afe38082>","title":"<e9809ae79fa5>","dev"**:**"1566197383,8cd49500fffe"**}**
+{"title":"<E4BDA0E5A5BD> word !","sendMsg":"msg-hello  <E4B896E7958C>!"}
+消息标题：你好 word !
+消息内容：hello 世界!
+```
 
 表格 6 消息应答
 
@@ -145,9 +148,12 @@ B类终端设备一直在线
 | ackSendMsg | string   | 应答，"ok"。 |
 | dev        | string   | msgid，mac   |
 
+```json
 示例：
+{"ackSendMsg":"1768212191,50C0F03046B7,ok"}
+```
 
-**{**"ackSendMsg":"ok","dev"**:**"1566197383,8cd49500fffe"**}**
+
 
 ## 4.MQTT接口
 
@@ -157,7 +163,7 @@ B类终端设备一直在线
 
 定时上报终端状态信息
 
-**上报基础频率：**NB-IoT终端：5分钟一次；Cat1终端：10分钟一次
+**上报基础频率：**Cat1终端：5分钟一次
 
 **降频状态：**
 
@@ -172,10 +178,9 @@ B类终端设备一直在线
 |       **键**        | **类型** | **含义**                                                     |
 | :-----------------: | :------: | ------------------------------------------------------------ |
 | outdoorLocationData |  object  | 定位信息等                                                   |
-|    LocationData     |  string  | 数据格式请查阅：[上报定位数据格式表](#上报定位数据格式表)，本数据包最多携带2个定位点，若当前缓存多余两个定位点，则此处只显示定位点数量。实际数据通过[cacheLocationDatas](#日常定位信息上报数据格式表)上报[1.4.7]  [新的上报方式] |
+|    LocationData     |  string  | 保留                                                         |
 |    locationTime     |  string  | 设备本地时间【格式YYYYMMDDTHHMMSS】                          |
 |   additionMessage   |  object  | 电池电量、计步和心率等                                       |
-|        tagID        |  string  | 终端MAC地址                                                  |
 |       battery       |  string  | 电量[内容为int]【0-100】                                     |
 |        step         |  string  | 计步【内容为int】                                            |
 |       celsius       |  string  | isWear为yes时为人体温度，no时为环境温度  内容为float，单位摄氏度。精确到小数点后两位 |
@@ -198,21 +203,21 @@ B类终端设备一直在线
 |       fatigue       |   int    | 疲劳度值 0~100，值越大表示越疲劳                             |
 |     stress_res      |   int    | 抗压能力0~100，值越大越好                                    |
 |     adj_ability     |   int    | 调节能力0~100，值越大越好                                    |
-|   adjacent_cells    |  array   | ["string1","string2",...]<br />string1: "lac,cell_id,mcc-mnc" |
+|   adjacent_cells    |  array   | ["string1","string2",...]<br />string1: "lac,cell_id,mcc-mnc"【邻近的4G基站信息，用于定位辅助】 |
 
 表格 8 心理健康测评指标表
 
 | 指标名称 |  差  |   中    |  好  |
 | :------: | :--: | :-----: | :--: |
 | 精神压力 | >68  | [58,68] | <58  |
-|  疲劳度  | <25  | [25,50] | >50  |
+|  疲劳度  | >50  | [25,50] | <25  |
 | 抗压能力 | <60  | [60,70] | >70  |
 | 调节能力 | <55  | [55,60] | >60  |
 
 ```json
 示例：
-{"outdoorLocationData":{"LocationData":"0103001961a771280d92d61843eb5a5c","locationTime":"20211201T125714","tagID":"C71FE3058A57","additionMessage":{"battery":"100","step":"0","calorie":0,"heart":0,"celsius":"28.00","pressure":4893.35,"spo2":0,"diastolic":0,"systolic":0,"isWear":"No","csq":20,"heartpack":0}}}
-说明：该协议最多上报两个定位点，更多缓存定位点通过协议cacheLocationDatas上报
+{"outdoorLocationData":{"LocationData":"","locationTime":"20260115T130101","additionMessage":{"battery":"39","hrv":"61.799,4967.988,995.607,1864.232,1405.281","step":"0","calorie":0,"heart":0,"rri":0,"celsius":"35.09","celsius_raw":"24.12,24.09","spo2":93,"diastolic":84,"systolic":115,"isWear":"no","csq":29,"heartpack":0,"lac":"25ee","cell_id":"213906562","mcc+mnc":"460+00","band":40,"net_mode":"tdd","stress":59,"fatigue":49,"stress_res":56,"adj_ability":45,"adjacent_cells":["25ee,213906562,460-15","2491,205592193,460-00","286b,233069890,460-00"]}}}
+目前LocationData缓存定位点通过协议cacheLocationDatas上报
 ```
 
 ### 4.2 心率监测上报（心率实时上报，功耗高）
@@ -223,28 +228,28 @@ B类终端设备一直在线
 
 |      **键**      | **类型** | **含义**                                                     |
 | :--------------: | :------: | ------------------------------------------------------------ |
-| setNbHeartReport |  string  | open：打开，close：关闭，                                    |
-|     interval     |   int    | 记录心率数据的时间间隔【1-10】，单位：秒  对于NB模组的终端，建议大于5s |
+| setNbHeartReport |  string  | open：打开，close：关闭，必须要检测是佩戴状态才能开启        |
+|     interval     |   int    | 记录心率数据的时间间隔【1-10】，单位：秒  建议大于5s。       |
+|     up_freq      |   int    | 上报频率【1-60】，单位s。【up_freq必须 >= interval且up_freq必须是interval的整数倍】 |
 |       dev        |  string  | msgid，mac                                                   |
-|     *up_freq     |   int    | 上报频率【1-60】，单位s                                      |
 
 ```json
 示例：
-{"setNbHeartReport":"open","interval":5,"dev":"1566197383,ce46831fdb93"}
+{"setNbHeartReport":"open","interval":5,"up_freq":10}
 ```
 
 设置响应
 
-|       **键**        | **类型** | **含义**                                                     |
-| :-----------------: | :------: | ------------------------------------------------------------ |
-| ackSetNbHeartReport |  string  | open：打开，close：关闭                                      |
-|      interval       |   int    | 记录心率数据的时间间隔【1-10】，单位：秒  对于NB模组的终端，建议大于5s |
-|         dev         |  string  | msgid，mac                                                   |
-|      *up_freq       |   int    | 上报频率【1-60】，单位s                                      |
+|       **键**        | **类型** | **含义**                                             |
+| :-----------------: | :------: | ---------------------------------------------------- |
+| ackSetNbHeartReport |  string  | open：打开，close：关闭                              |
+|      interval       |   int    | 记录心率数据的时间间隔【1-10】，单位：秒  建议大于5s |
+|       up_freq       |   int    | 上报频率【1-60】，单位s                              |
+|         dev         |  string  | msgid，mac                                           |
 
 ```json
 示例：
-{"ackSetNbHeartReport":"open","interval":5,"dev":"1566197383,ce46831fdb93"}
+{"ackSetNbHeartReport":"open","interval":5,"up_freq":10,"isWear":"yes","dev":"1768216154,50C0F0A29D1D"}
 ```
 
 
@@ -258,63 +263,17 @@ B类终端设备一直在线
 | nbHeartReport | string   | 心率数据，个数不定。                                         |
 | count         | int      | 上报的心率个数。                                             |
 | interval      | int      | 每个心率数据的时间间隔，单位：秒                             |
-| *up_freq      | int      | 上报频率【1-60】，单位s                                      |
+| up_freq       | int      | 上报频率【1-60】，单位s                                      |
 | HeartTime     | string   | 上报第一个心率的采集时间 单位秒【从北京时间1970年1月1日0点开始】 |
 | dev           | string   | msgid，mac                                                   |
 
 ```json
-示例：{"nbHeartReport":"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0","count":27,"interval":5,"HeartTime":"1603278393","dev":"1603278393,ce46831fdb93"}
+示例：{"nbHeartReport":"67,67","count":2,"interval":5,"up_freq":10,"HeartTime":"1768216159","dev":"1768216164,50C0F0A29D1D"}
 ```
 
 ### 4.3 设置
 
-#### 4.3.1 MQTT服务器配置（服务器地址配置我司测试服务器则不支持）
-
-表格 11 MQTT服务器配置
-
-|      **键**       | **类型** | **含义**         |
-| :---------------: | :------: | ---------------- |
-| mqttConfiguration |  object  | 服务器IP、端口等 |
-|       host        |  string  | IP地址           |
-|       port        |  string  | 端口，0~65535    |
-|     clientId      |  string  | 客户端id         |
-|     userName      |  string  | 用户名           |
-|    userPasswrd    |  string  | 密码             |
-|  topicSubscribe   |  string  | 订阅主题         |
-|  topicPublisher   |  string  | 发布主题         |
-|        qos        |   int    | 消息等级0~2      |
-|     retained      |   int    | 消息保留开关     |
-
-**注意：修改mqtt配置需谨慎，修改错误后将会导致无法通信，无法通过恢复出厂设置恢复默认配置。**
-
-```json
-示例：
-只修改设置服务器和端口
-{"mqttConfiguration":{"host":"mqtest.imyfit.com","port":"1883"},"dev":"1566197383,8cd49500fffe"}
-响应：
-{"mqttConfiguration":{"host":"mqtest.imyfit.com","port":1883,"clientId":"C460046645709170","qos":1,"retained":0,"topicPublisher":"dev/cloud/E35DC73E730D","topicSubscribe":"dev/E35DC73E730D/cloud","userName":"","userPasswrd":""},"dev"**:**"1566197383,8cd49500fffe"}
-```
-
-#### 4.3.2 自动校准时间
-
-设置开启自动校准时间后将会通过NB网络或者GPS校准时间，优先通过NB网络设置。
-
-表格 12 自动校准时间
-
-|      **键**       | **类型** | **含义**                                |
-| :---------------: | :------: | --------------------------------------- |
-| setTimeAutoPeriod |  string  | open：开启自动校准，close：关闭自动校准 |
-|        dev        |  string  | msgid，mac                              |
-
-```json
-示例：
-开启自动校准时间：
-{"setTimeAutoPeriod":"open","dev":"1566197383,8cd49500fffe"}
-关闭自动校准时间：
-{"setTimeAutoPeriod":"close","dev":"1566197383,8cd49500fffe"}
-```
-
-#### 4.3.3 设置学生信息【部分设备支持】
+#### 4.3.1 设置学生信息【设置个人信息，未启用】
 
 **设置：**
 
@@ -340,7 +299,7 @@ B类终端设备一直在线
 {"ackSetStudentInfo":"ok","dev":"1566197383,8cd49500fffe"}
 ```
 
-#### 4.3.4 系统参数设置接口
+#### 4.3.2 系统参数设置接口
 
 **设置：**
 
@@ -373,37 +332,39 @@ B类终端设备一直在线
 | heart_execption |     心率异常     |                          open/close                          | 心率预警配置："min,max,interval,period"<br />min - 心率预警最小值（0~255）<br />max - 心率预警最大值（0~255）<br />interval - 预警检测间隔（秒）<br />period - 预警周期（分钟） |
 |         spo2          |   血氧连续监测   |                          open/close                          | 连续监测间隔时间【分钟】，默认值5，可修改为5的倍数，最大60   |
 | spo2_execption  |     血氧异常     |                          open/close                          | 血氧预警配置："min,max,interval,period"<br />min - 血氧预警最小值（0~100）<br />max - 血氧预警最大值（0~100）<br />interval - 预警检测间隔（秒）<br />period - 预警周期（分钟） |
-| temperature_execption |     体温异常     |                          open/close                          | 预警最小值和最大值，中间用‘,’隔开。默认值35，38              |
-|  pressure_execption   |     气压异常     |                          open/close                          | 预警最小值和最大值，中间用‘,’隔开。                          |
 |     bloodpressure     |     血压监测     |                          open/close                          | 连续监测间隔时间【分钟】，默认值5，可修改为5的倍数，最大60   |
 |  bp_execption   |     血压异常     |                          open/close                          | 血压预警配置：""sys_min,sys_max,dia_min,dia_max,interval,period"<br />sys_min - 收缩压预警最小值（0~255）<br />sys_max - 收缩压警最大值（0~255）<br />dia_min - 舒张压警最小值（0~255）<br />dia_max - 舒张压警最大值（0~255）<br />interval - 预警检测间隔（秒）<br />period - 预警周期（分钟） |
-|        remind         |    自定义提醒    |     自定义提醒总数+本数据包提醒数量。<br />中间逗号隔开      | 16进制字符串【解析请先将两个字节转换位一个16进制数】，删除时发送编号即可。  数据结构参考提醒参数表 |
 |          hrv          |     Hrv监测      |                          open/close                          | 连续监测间隔时间【分钟】，默认值5，可修改为5的倍数，最大60   |
-|        btscan         | 蓝牙扫描功能设置 | “scan_switch,<br />fence_switch,<br />flag,<br />period,<br />config_period,<br />timeout,<br />filter_name,<br />filter_rssi,<br />in_period, <br />out_period"<br />具体内容参考：  蓝牙扫描设置state参数表 | BT围栏数据  最多可以跟7个围栏数据  围栏数据参考围栏参数表    |
-|       #nb_config       |   远程上报控制   |                              无                              | 16进制字符串【解析请先将两个字节转换位一个16进制数】具体内容参考NB上报配置参数表 |
-|     adv_frequency     | 广播间隔时间设置 |                              无                              | “广播间隔，静止广播间隔，SOS广播间隔”<br />单位10ms   默认"33,100,33" |
-|       wifiscan        |   WIFI扫描配置   | “scan_switch,<br />fence_switch,<br />flag,<br />period,<br />config_period,<br />in_period, <br />out_period"<br />具体内容参考：  蓝牙扫描设置state参数表 | 最多可以跟7个围栏数据  围栏数据参考围栏参数表                |
-| *nb_config_slim | 远程上报控制slim | 无 | “正常上报频率，不佩戴上报频率，睡眠上报频率，不佩戴夜间上报频率”<br />单位分钟 |
+|        btscan【定制功能，默认不启用】        | 蓝牙扫描功能设置 | “scan_switch,<br />fence_switch,<br />flag,<br />period,<br />config_period,<br />timeout,<br />filter_name,<br />filter_rssi,<br />in_period, <br />out_period"<br />具体内容参考：  蓝牙扫描设置state参数表 | BT围栏数据  最多可以跟7个围栏数据  围栏数据参考围栏参数表    |
+|       wifiscan【以默认配置常开】       |   WIFI扫描配置   | “scan_switch,<br />fence_switch,<br />flag,<br />period,<br />config_period,<br />in_period, <br />out_period"<br />具体内容参考：  蓝牙扫描设置state参数表 | 最多可以跟7个围栏数据  围栏数据参考围栏参数表                |
+| nb_config_slim | 远程上报控制slim | 无 | “正常上报频率，不佩戴上报频率，睡眠上报频率，不佩戴夜间上报频率”<br />单位分钟 |
 
 表格 18 远程上报配置参数表
 
 | 字节序号 | 说明                                                         |
 | :------: | :----------------------------------------------------------- |
-|    1     | 正常上报的频率，单位分钟，Cat1设备默认10，NB-Iot设备默认5    |
-|    2     | 不佩戴上报频率，单位分钟，Cat1设备默认20，NB-Iot设备默认10   |
-|    3     | 睡眠状态上报频率，单位分钟，Cat1设备默认60，NB-Iot设备默认30 |
-|    4     | 不佩戴夜间上报频率，单位分钟，Cat1设备默认120，NB-Iot设备默认60 |
+|    1     | 正常上报的频率，单位分钟，Cat1设备默认5                      |
+|    2     | 不佩戴上报频率，单位分钟，Cat1设备默认10                     |
+|    3     | 睡眠状态上报频率，单位分钟，Cat1设备默认30                   |
+|    4     | 不佩戴夜间上报频率，单位分钟，Cat1设备默认60                 |
 |   5-10   | 预留备用                                                     |
 |  11-20   | 低电量上报频率，可设置5组，每组两个字节，分别表示电量和低于此电量则使用此频率上报，下发数据电量递增排列 |
 |  21-40   | 2B一组，可设置10组时间段，例如0x04 0x05 0x08 0x09表示4点到5点，8点到9点都关闭上报 |
 |    41    | 功能标记<br />0x80下发存储标记                               |
 
-```
-示例：
-配置上报频率任何情况下都为2分钟一次
-{"setSystemParameter":"set","type":"nb_config","state":"","value":"0202020200000000000000000000000000000000000000000000000000000000000000000000000080","dev":"1566197383,FC3554B0D5EC"}
+```json
+示例1：
+配置上报频率在正常上报时为1分钟一次，不佩戴上报时为2分钟一次，睡眠状态上报时为3分钟一次，不佩戴夜间上报时为4分钟一次
+{"setSystemParameter":"set","type":"nb_config_slim","state":"","value":"1,2,3,4"}
 响应：
-{"ackSetSystemParameter":"ok","type":"nb_config","state":"","value":"0202020200000000000000000000000000000000000000000000000000000000000000000000000080","dev":"1566197383,FC3554B0D5EC"}
+{"ackSetSystemParameter":"ok","type":"nb_config_slim","state":"open","value":"1,2,3,4","dev":"1768218345,50C0F0A29D1D"}
+
+示例2：
+以开启心率异常和温度异常为例
+{"setSystemParameter":"set","type":"heart_execption","state":"open","value":"50,100,60,5"}
+此处设置心率低于50或高于100时触发异常事件，60秒检测一次，5分钟告警一次
+{"setSystemParameter":"set","type":"temperature_execption","state":"open","value":"36,38"}
+设置体温范围36~38°C，正常体温易触发
 ```
 
 
@@ -414,7 +375,7 @@ B类终端设备一直在线
 | :-----------: | :------: | :----------------------------------------------------------- |
 |  scan_switch  |   int    | 0关闭 1开启                                                  |
 | fence_switch  |   int    | 用一个字节表示7个围栏的开关状态                              |
-|     flag      |   int    | 0x00000001上报扫描数据<br />0x00000002扫描结束立即上传数据<br />0x00000004只扫描beacon设备<br />0x00000008 只扫描我司设备b6,b7,b8<br />0x00000010 只扫描特定设备，filter_name过滤<br />0x00000020 只扫描一定范围内的设备 filter_rssi过滤<br />0x00000040 特定围栏，匹配filter_name则触发围栏<br />0x00000080 校时标记[仅支持我司网关校时]<br />0x00000100 上报和围栏【启用上报或者围栏，需使用此标记】<br />0x00000200 只扫描围栏设定的设备 匹配围栏1设定的设备<br />0x00000400 只上报信号最强的三个设备<br />0x00000800 离开围栏加入计步判断，计步增加才能出围栏，防止漂移<br />*0x00001000 扫描失败也上报<br />0x80000000 下发存储标记【用于收到后是否存储】<br />说明：WIFI只使用0x00000001，0x00000002，0x80000000<br />**注意：实际发送的时候发送32位无符号整数** |
+|     flag      |   int    | 0x00000001上报扫描数据<br />0x00000002扫描结束立即上传数据<br />0x00000004只扫描beacon设备<br />0x00000008 只扫描我司设备b6,b7,b8<br />0x00000010 只扫描特定设备，filter_name过滤<br />0x00000020 只扫描一定范围内的设备 filter_rssi过滤<br />0x00000040 特定围栏，匹配filter_name则触发围栏<br />0x00000080 校时标记[仅支持我司网关校时]<br />0x00000100 上报和围栏【启用上报或者围栏，需使用此标记】<br />0x00000200 只扫描围栏设定的设备 匹配围栏1设定的设备<br />0x00000400 只上报信号最强的三个设备<br />0x00000800 离开围栏加入计步判断，计步增加才能出围栏，防止漂移<br />0x00001000 扫描失败也上报<br />0x80000000 下发存储标记【用于收到后是否存储】<br />说明：WIFI只使用0x00000001，0x00000002，0x80000000<br />**注意：实际发送的时候发送32位无符号整数** |
 |    period     |   int    | 扫描周期 单位秒 范围1-3600，**默认300**                      |
 | config_period |   int    | 用于状态切换后确认状态的扫描周期 单位秒 范围 1-255，**默认5** |
 |    timeout    |   int    | 一次扫描超时时间 单位毫秒 范围10-5000，**默认500**           |
@@ -423,12 +384,28 @@ B类终端设备一直在线
 |   in_period   |   int    | 判定在围栏内的扫描周期数 范围1-10 **默认1**                  |
 |  out_period   |   int    | 判定离开围栏的扫描周期数 范围1-10 **默认5**                  |
 
-```
-示例：
-设置开启WIFI扫描【上报扫描数据，只扫描Beacon设备，只扫描特定设备filter_name过滤，存储配置】
-{"setSystemParameter":"set","type":"btscan","state":"1,0,2147483925,600,5,5000,Holy-IOT,-70,1,5","dev":"1566197383,FC3554B0D5EC"}
+```json
+示例1：
+设置开启蓝牙扫描【上报扫描数据，只扫描特定设备filter_name过滤，存储配置】
+发送：
+{"setSystemParameter":"set","type":"btscan","state":"1,0,2147483923,10,5,5000,H21,-70,1,5","value":""}
 设备响应
-{"ackSetSystemParameter":"ok","type":"btscan","state":"1,0,2147483925,600,5,5000,Holy-IOT,-70,1,5","value":"","dev":"1682417483,ee83279c5250"}
+{"ackSetSystemParameter":"ok","type":"btscan","state":"1,0,2147483923,10,5,5000,H21,-70,1,5","value":"0000000000000000000000000000","dev":"1769163009,50C0F0A938C7"}
+数据接收：
+{"apInfo":"50:c0:f0:30:46:b7,-54;","type":"1","apNum":"1","time":"1769163064","dev":"1769163064,50C0F0A938C7"}
+
+示例2：
+开启蓝牙扫描【上报扫描数据，扫描结束立即上报数据，只扫描rssi范围内的设备，启用上报，只扫描特定MAC的设备】
+发送：
+{"setSystemParameter":"set","type":"btscan","state":"1,0,2147484451,10,5,5000,0,-100,1,5","value":"01011918FC00000003"}
+只扫描MAC地址开头三个字节为1918FC的设备
+响应：
+{"ackSetSystemParameter":"ok","type":"btscan","state":"1,0,2147484451,10,5,5000,0,-100,1,5","value":"01011918fc00000003000000000000000000000000","dev":"1769162685,50C0F0A938C7"}
+数据接收：
+{"apInfo":"19:18:fc:54:03:8d,-75;19:18:fc:54:03:8e,-79;19:18:fc:54:03:89,-81;19:18:fc:54:03:90,-78;19:18:fc:54:03:8a,-79;19:18:fc:2e:9b:11,-50;19:18:fc:54:03:8c,-82;19:18:fc:54:03:8f,-86;19:18:fc:54:03:91,-79;","type":"1","apNum":"9","time":"1769162700","dev":"1769162700,50C0F0A938C7"}
+
+筛选多种名称示例：
+"value":"01051918FC000000034846000000000350000000000001260C000000000245C60000000002"
 ```
 
 
@@ -480,6 +457,7 @@ B类终端设备一直在线
       <td></td>
   </tr>
   </table>
+
 
 ```json
 示例：设置两个WIFI围栏:{"setSystemParameter":"set","type":"wifiscan","state":"1,3,2147483649,300,10,2,5","value":"0F018CD495000987060F018CD49500128806","dev":"1566197383,FC3554B0D5EC"}
@@ -586,9 +564,13 @@ B类终端设备一直在线
 |       dev        |  string  | msgid，mac。                                           |
 
 ```json
-示例：
-请求：{"heartRequest":"20210108","start":187,"pack":187,"dev":"1610120225,e990c0fc3e3f"}
-回复：{"heartOfflineData":"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0","count":60,"pack":187,"interval":5,"date":"20210108","dev":"1610120225,e990c0fc3e3f"}
+示例1：
+请求：{"heartRequest":"20260112","start":144,"end":145}
+回复：{"heartOfflineData":"83,86,89,89,86,83,81,77,75,74,75,77,76,75,74,71,69,68,68,70,71,71,71,70,69,68,66,68,72,75,77,78,77,74,73,72,70,70,70,72,73,72,72,71,71,72,71,71,71,71,72,72,74,76,76,76,81,90,92,88","count":60,"pack":144,"interval":5,"date":"20260112","dev":"1768225921,50C0F0A29D1D"}
+
+示例2：{"heartRequest":"20260112","packs":"145,146"}
+{"heartOfflineData":"87,86,87,88,83,74,68,66,65,65,66,69,72,71,67,65,65,65,65,65,65,65,65,64,64,63,63,62,62,62,62,62,63,64,64,64,65,66,65,64,63,63,63,62,62,67,74,75,74,74,74,74,75,77,82,84,82,77,73,72","count":60,"pack":145,"interval":5,"date":"20260112","dev":"1768226122,50C0F0A29D1D"}
+{"heartOfflineData":"69,67,65,65,65,67,68,69,68,67,66,66,65,65,65,65,64,64,64,65,67,68,68,69,71,71,74,78,87,93,85,77,73,71,72,74,73,71,70,69,68,69,69,70,72,75,76,75,75,78,80,81,78,73,71,70,68,67,67,67","count":60,"pack":146,"interval":5,"date":"20260112","dev":"1768226122,50C0F0A29D1D"}
 ```
 
 **注意：**
@@ -688,9 +670,9 @@ B类终端设备一直在线
 
 ```json
 示例：
-{"rsqCalorieData":"20210107","dev":"1566197383,8cd49500fffe"}
+{"rsqCalorieData":"20260121"}
 返回：
-{"calorieData":"0a002200000000000000000000000000200038000900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","pack":"1","total":"4","data":"20210107","dev":"1566197383,8cd49500fffe"}
+{"calorieData":"00000000000000000000000000000000ffff0000000000000000000000000000000000000000000000000000ffff0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","pack":"1","total":"4","date":"20210126","dev":"1769019635,50C0F0A29D1D"}
 ```
 
 **注意：**
@@ -719,6 +701,13 @@ B类终端设备一直在线
 |  total   |   int    | 总包数【固定2】                                              |
 |   date   |  string  | 年月日，如：20201014                                         |
 |   dev    |  string  | msgid，mac                                                   |
+
+```json
+示例：
+{"rsqSpo2Data":"20260121"}
+返回：
+{"spo2Data":"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff63636363ff636363636363ff6363636363","pack":"1","total":"2","date":"20210126","dev":"1769019708,50C0F0A29D1D"}
+```
 
 **注意：**
 
@@ -750,9 +739,9 @@ B类终端设备一直在线
 ```json
 示例：
 请求：
-{"rsqTempData":"20210107","dev":"1566197383,8cd49500fffe"}
+{"rsqTempData":"20260121"}
 返回：
-{"tempData":"6a1a7e1a951a861a941a621a651a741a6f1a401a4f193019e219b11a6e1a3d1a3a1a1b1a121a141a131a631a6e1a911a991a701a491a4e1a5c1a4f1a401a671a8b1ab91adf1af91a0f1b231b311b531b4e1b551b571b5e1b4c1bfd1a981a541a441a771ad01af01afe1a141b311b281b2d1b371b441b501b511b3c1b311b2f1b0a1ba11a4a1a441a691a821aa31ab91a","pack":"1","total":"8","date":"20210416","dev":"1618588688,c48d8ce87eeb"}
+{"tempData":"ffffb208ffffae08ffffaa08ffffa908ffffa708ffffa508ffffa508ffffa308ffffa508ffffffffffffa208ffff9e08ffff9d08ffff9c08ffff9a08ffff9a08ffff9a08ffff9908ffff9608ffff9508ffff9208ffff9208ffff9108ffffffffffff8e08ffff8b08ffff8b08ffff8808ffff8708ffff8708ffff8308ffff8308ffff8308ffff7f08ffff8108ffff7e08","pack":"1","total":"8","date":"20210126","dev":"1769019789,50C0F0A29D1D"}
 ```
 
 **注意：**
@@ -761,7 +750,7 @@ B类终端设备一直在线
 
 2. 温度离线数据不主动上报
 
-#### 4.4.7 RRI离线数据
+#### 4.4.7 RRI离线数据【未启用】
 
 5s一次数据，包总数为288包。
 
@@ -807,10 +796,18 @@ B类终端设备一直在线
 |    **键**    | **类型** | **含义**                                                     |
 | :----------: | :------: | ------------------------------------------------------------ |
 | pressureData |  string  | 气压数据<br />为16进制字符串，需转换为16进制数组【转换方式参考睡眠数据】，共144字节<br />每四个字节代表一个气压数据(3byte 整数【低字节在前】 + 1byte 小数) ，共计6小时数据 |
-|     pack     |   int    | 包序号【1-4】                                                |
-|    total     |   int    | 包总数【固定4包】                                            |
+|     pack     |   int    | 包序号【1-8】                                                |
+|    total     |   int    | 包总数【固定8包】                                            |
 |     date     |  string  | 年月日，如：20201014                                         |
 |     dev      |  string  | msgid，mac                                                   |
+
+```json
+示例：
+请求：
+{"rsqPressureData":"20260121"}
+返回：
+{"pressureData":"ffffb208ffffae08ffffaa08ffffa908ffffa708ffffa508ffffa508ffffa308ffffa508ffffffffffffa208ffff9e08ffff9d08ffff9c08ffff9a08ffff9a08ffff9a08ffff9908ffff9608ffff9508ffff9208ffff9208ffff9108ffffffffffff8e08ffff8b08ffff8b08ffff8808ffff8708ffff8708ffff8308ffff8308ffff8308ffff7f08ffff8108ffff7e08","pack":"1","total":"8","date":"20210126","dev":"1769020359,50C0F0A29D1D"}
+```
 
 **注意：**
 
@@ -838,6 +835,14 @@ B类终端设备一直在线
 |  date  |  string  | 年月日，如：20201014                                         |
 |  dev   |  string  | msgid，mac                                                   |
 
+```json
+示例：
+请求：
+{"rsqBpData":"20260121"}
+返回：
+{"bpData":"ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00ffff00","pack":"6","total":"6","date":"20210126","dev":"1769022255,50C0F0A29D1D"}
+```
+
 **注意：**
 
 1. 如果请求的数据包内容全为0x00或者0xFF，则终端不回应，系统可以使用4.11协议获取离线数据概况，判断哪些包包含有效数据
@@ -858,28 +863,31 @@ B类终端设备一直在线
 
 表格 41 回复/主动上报离线信息状态
 
-|   **键**    | **类型** | **含义**                                                     |
-| :---------: | :------: | ------------------------------------------------------------ |
-| generalData |  string  | 年月日，如：20201014                                         |
-|    date     |  string  | 显示存在数据的日期，每天固定8个字节 例如  2020101420201015，最大56字节 |
-|    heart    |  string  | 16进制字符串72字节，每两个字节表示一个byte  每一位表示一个包的状态<br />0为无有效数据<br />1为有效数据<br />包序号定位方法：<br />byte=(pack -1)/8 <br />bit=(pack-1)%8 |
-|    sleep    |  string  | 1字节或者2字节 0：无睡眠数据 1：有睡眠数据                   |
-|    step     |  string  | 4字节 0000：无计步数据 1111：有计步数据                      |
-|   calorie   |  string  | 4字节 0000：无热量数据 1111：有热量数据                      |
-|    spo2     |  string  | 2字节 00：无血氧数据 11：有血氧数据                          |
-|    temp     |  string  | 8字节 00000000：有温度数据 11111111：有温度数据              |
-|     rri     |  string  | 同heart                                                      |
-|  pressure   |  string  | 4字节 0000：无气压数据 1111：有气压数据                      |
-|     bp      |  string  | 6字节 000000：无血压数据 111111：有血压数据                  |
-|     hrv     |  string  | 16字节或者18字节                                             |
-|     dev     |  string  | msgid，mac。                                                 |
+|     **键**     | **类型** | **含义**                                                     |
+| :------------: | :------: | ------------------------------------------------------------ |
+|  generalData   |  string  | 年月日，如：20201014                                         |
+|      date      |  string  | 显示存在数据的日期（最多显示7天），每天固定8个字节 例如  “20201014”，”20201015” |
+|     heart      |  string  | 16进制字符串72字节，每两个字节表示一个byte  每一位表示一个包的状态<br />0为无有效数据<br />1为有效数据<br />包序号定位方法：<br />byte=(pack -1)/8 <br />bit=(pack-1)%8 |
+| step【未启用】 |  string  | 4字节 0000：无计步数据；1111：有计步数据                     |
+| spo2【未启用】 |  string  | 2字节 00：无血氧数据；11：有血氧数据                         |
+|      temp      |  string  | 8字节 00000000：无温度数据 ；11111111：有温度数据            |
+| rri【未启用】  |  string  | 同heart                                                      |
+|    pressure    |  string  | 4字节 0000：无气压数据 ；1111：有气压数据                    |
+|       bp       |  string  | 6字节 000000：无血压数据；111111：有血压数据                 |
+|      hrv       |  string  | 16字节或者18字节                                             |
+|     sleep      |  string  | 1字节或者2字节 0：无睡眠数据；1：有睡眠数据                  |
+|    calorie     |  string  | 4字节 0000：无热量数据；1111：有热量数据                     |
+|      dev       |  string  | msgid，mac。                                                 |
 
 ```json
 示例：
-{"generalData":"20210414","date":"20210414202104152021041620210410202104112021041220210413","heart":"ffff7ff8ffffffffffff7fe09dff00020000000000000000000000000000000000000000","sleep":"1","step":"1100","calorie":"1110","temp":"00000001","spo2":"11","rri":"ffff7ff8ffffffffffff7fe09dff00020000000000000000000000000000000000000000","pressure":"1111","bp":"111111","dev":"1618588086,c48d8ce87eeb"} 
+请求：
+{"rsqGeneralData":"20260126"}
+响应：
+{"generalData":"20260126","date":""20260125","20260126"","heart":"ffffffff1f00000,"temp":"10110000","pressure":"11111000","bp":"001000","hrv":"11110000000011111111100000000000","sleep":"00","calorie":"0100","dev":"1769436825,50C0F0A6DFD2"}
 ```
 
-#### 4.4.11 佩戴状态离线数据
+#### 4.4.11 佩戴状态离线数据【未启用】
 
  5s记录一个状态，用1位标记[0为佩戴，1为未佩戴]，一个字节记录40s的佩戴状态，40s存储一次
 
@@ -909,12 +917,9 @@ HRV记录5个参数
 
 表格 44 请求HRV离线数据
 
-| **键** | **类型** | **含义**                                     |
-| :----: | :------: | ---------------------------- |
-| rsqHRV |  string  | 年月日，如：20201014         |
-|  type  |   int    | 有且1表示新格式              |
-|  dev   |  string  | msgid，mac                                   |
-|  pack  |  string  | 请求第几包数据[无则表示所有] |
+| **键** | **类型** | **含义**             |
+| :----: | :------: | -------------------- |
+| rsqHRV |  string  | 年月日，如：20201014 |
 
 表格 45 手环上报定位离线数据
 
@@ -927,12 +932,19 @@ HRV记录5个参数
 |    date    |  string  | 年月日，如：20201014                                         |                                                              |
 |    dev     |  string  | msgid，mac                                                   |                                                              |
 
+```json
+示例：
+请求：
+{"rsqHRV":"20260126"}
+响应：{"offlineHRV":"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff","pack":"1","total":"32","date":"20260126","dev":"1769427701,50C0F0A29D1D"}
+```
+
 **注意：**
 
 1. 如果请求的数据包内容全为0x00或者0xFF，则终端不回应，系统可以使用4.11协议获取离线数据概况，判断哪些包包含有效数据
 2. HRV离线数据不主动上报
 
-#### 4.4.13 定位离线数据
+#### 4.4.13 定位离线数据【未启用】
 
 5分钟存储一次，一次11字节 一天288个定位数据，共3168字节
 
@@ -997,7 +1009,6 @@ HRV记录5个参数
 |  manual_gps  |   int    | 请求定位时间[manual_gps字段]                                 |
 |  sport_cwm   |  string  | CWM运动事件数据参看CWM运动数据表【运动事件才有这个字段】【CWM运动事件字段】 |
 |    charge    |  string  | 充电状态<br />  "charge_status,charge_in_time, charge_start_time, charge_end_time, charge_full_time,charge_out_time"<br />   charge_status:<br />   0x01-插入充电器 0x02-开始充电 0x04-结束充电<br />   0x08-充满电 0x10-拔掉充电器<br />**0x02和0x04状态未使用，charge_start_time和charge_end_time未使用** |
-|              |          |                                                              |
 
 ```json
 示例：
@@ -1014,28 +1025,24 @@ HRV记录5个参数
 |          on          |       终端开机       | 0x00000001 |
 |       lowpower       |  终端电量低停止上报  | 0x00000002 |
 |         off          |       终端关机       | 0x00000004 |
-|         sos          |       sos信号        | 0x00000008 |
+|         sos【上报定位】         |       sos信号        | 0x00000008 |
 |        heart         |       心率异常       | 0x00000010 |
-|         temp         |       温度异常       | 0x00000020 |
+|         temp【未启用】         |       皮肤温度异常       | 0x00000020 |
 |         spo2         |       血氧异常       | 0x00000040 |
-|       pressure       |       气压异常       | 0x00000080 |
 |      diastolic       |     血压低压异常     | 0x00000100 |
 |       systolic       |     血压高压异常     | 0x00000200 |
-|        check         |       打卡事件       | 0x00000400 |
+|        check        |       打卡事件       | 0x00000400 |
 |     sport/sport2     |       运动事件       | 0x00000800 |
-|      spo2_test       |   手动测试血氧事件   | 0x00001000 |
-|    bpressure_test    |   手动测试血压事件   | 0x00002000 |
-|     stroke_test      | 手动测试中风风险测试 | 0x00004000 |
-|        fence         |       围栏事件       | 0x00008000 |
-|      fall_alarm      |     跌倒告警事件     | 0x00010000 |
-|     device_info      |   定时上报系统信息   | 0x00020000 |
-|      manual_gps      |     手动定位事件     | 0x00040000 |
+|      spo2_test【未启用】 |   手动测试血氧事件   | 0x00001000 |
+|    bpressure_test【未启用】    |   手动测试血压事件   | 0x00002000 |
+|     stroke_test【未启用】     | 手动测试中风风险测试 | 0x00004000 |
+|        fence        |       围栏事件       | 0x00008000 |
+|      fall_alarm【部分设备启用】      |     跌倒告警事件     | 0x00010000 |
+|     device_info【未启用】     |   定时上报系统信息   | 0x00020000 |
 | sport_cwm/sport_cwm2 |     CWM运动事件      | 0x00080000 |
-|        charge        |       充电事件       | 0x00100000 |
-|       testinfo       |     预留调试信息     | 0x00200000 |
-|      wear_down       |       脱腕事件       | 0x00400000 |
+|        charge        |       充电事件[跟随其他事件组合上报]       | 0x00100000 |
+|      wear_down【未启用】      |       脱腕事件       | 0x00400000 |
 |     info_change      | 信息变更事件[mqtt配置或者sim卡] | 0x00800000 |
-|                      |                                 |            |
 
 以上事件，有多个事件的时候进行统一上报
 
@@ -1121,7 +1128,7 @@ HRV记录5个参数
 
 
 
-表格 51 运动数据格式【sport_cwm/sport_cwm2】
+表格 51 运动数据格式【sport_cwm/sport_cwm2】格式，轨迹
 
 <table>
   <tr>
@@ -1222,8 +1229,6 @@ HRV记录5个参数
 </table>
 
 
-
-
 **注释：**
 
 sos, fall_alarm事件上报
@@ -1288,7 +1293,7 @@ sos, fall_alarm事件上报
 |    times    |   int    | 定位次数 0xff表示一直定位                   |
 |  #starttime |  string  | 定位开始时间【type为1和2时使用】  时间戳【北京时间】         |
 |   #endtime   |  string  | 定位结束时间【type为1和2时使用】  时间戳【北京时间】<br />**开始结束时间都为0表示一直定位** |
-|    flags    |   int    | 定位功能标记<br />0x00000001:定位完成立即上报<br />0x00000002:缓存等待NB定时上报<br />0x00000004:缓存区满了立即上报<br />0x00000008:使用NB上报频率<br />0x00000010:睡眠状态下不开启定位<br />0x00000020:脱腕状态下不开启定位<br />0x00000040:开启基站定位[B10C有效]<br />0x00000080:开启WIFI定位[B10C有效]<br />0x80000000:下发数据保存标记 |
+|    flags    |   int    | 定位功能标记<br />0x00000001:定位完成立即上报<br />0x00000002:缓存等待定时信息上报<br />0x00000004:缓存区满了立即上报<br />0x00000008:使用定时信息上报频率<br />0x00000010:睡眠状态下不开启定位<br />0x00000020:脱腕状态下不开启定位<br />0x00000040:开启基站定位[B10C有效]<br />0x00000080:开启WIFI定位[B10C有效]<br />0x80000000:下发数据保存标记 |
 |   timeout   |   int    | 定位超时时间, 单位秒 范围60-600，**默认120** |
 | bad_timeout |   int    | 信号差定位超时时间, 单位秒 范围10-255，**默认30** |
 | delay_off_time | int | 用于过滤定位数据 单位秒 范围20-3600，**默认20** |
@@ -1299,9 +1304,16 @@ sos, fall_alarm事件上报
 终端增加定位信息存储，共缓存最近40个点【40*15=600字节】
 
 ```json
-示例：
-1. 请求多次定位，定位频率5分钟，不限次数【其他参数使用默认】
-{"getgps":"","type":1,"frequency":5,"times":255,"dev":"1566197383,f2729d7c4eb1"}
+模拟场景示例：
+1.日常佩戴【其他参数使用默认】
+{"getgps":"set","type":1,"frequency":10,"times":255,"delay_off_time":30,"data_interval":5,"flags":2147483894}
+跟随定时信息上报的频率上报
+2.打卡签到【其他参数使用默认】
+{"getgps":"set","type":0,"frequency":1,"times":1,"delay_off_time":60,"data_interval":60,"flags":2147483893}
+一分钟上报一次定位，上报三次
+3.实时追踪【其他参数使用默认】
+{"getgps":"set","type":2,"frequency":5,"times":255,"delay_off_time":10,"data_interval":10,"flags":2147483893}
+10秒上报一次，持续上报，脱腕及睡眠情况下也上报
 ```
 
 NB终端打开GPS，终端根据情况采用多种定位方式完成定位，采用定时信息上报，若存在缓存定位点[无网络没有及时上报]，则使用cacheLocationDatas上报上报定位数据采用连续编码方式【解析前先将16进制字符串转换为16进制数组】
@@ -1317,6 +1329,11 @@ NB终端打开GPS，终端根据情况采用多种定位方式完成定位，采
 | 第二个定位数据 |        15        | 同第一个定位数据                         |
 |      ....      |       ....       | .....                                    |
 | 第n个定位数据  | 同第一个定位数据 | 同第一个定位数据                         |
+
+```json
+定位数据上报示例：
+{"cacheLocationDatas":"01052f00ff907769ebfb5a0161ccca06","dev":"1769443583,50C0F0A29D1D"}
+```
 
 表格 55 定位数据格式[离线定位信息不存储时间]
 
@@ -1386,7 +1403,7 @@ https://lbs.amap.com/demo/jsapi-v2/example/other-gaode/othertoamap
 | lver      | string | 固件版本[定义参考开机事件上报]                               |
 | dev       | string | msgid，mac[定义参考开机事件上报]                             |
 
-```
+```json
 示例：
 {"func":"otaack","type":"h21","device_id":"0840","nbver":"AL32HXXX_V1.8.7_0103_0109_0109","lver":"1.0.0.0_07112221","dev":"1754899567,50C0F048445F"}
 {"func":"ota_modemack","type":"h21","device_id":"0840","nbver":"AL32HXXX_V1.8.7_0103_0109_0109","lver":"1.0.0.0_07112221","dev":"1754899567,50C0F048445F"}
