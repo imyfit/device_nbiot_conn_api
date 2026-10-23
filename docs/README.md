@@ -1048,15 +1048,32 @@ HRV记录5个参数
 
 以上事件，有多个事件的时候进行统一上报
 
-表格 50 运动数据格式【sport】（系统事件组合包中的 "sport" 字段）
+表格 50 运动数据格式【sport】（data及以上为 "sport" 字段，data以下为data 字段）
 
-|  **键**   | **类型** | **含义**                                |
-| :-------: | :------: | --------------------------------------- |
-|  status   |   int    | 1：运动开始；2：运动结束                |
-| starttime |   int    | 开始时间，本地时间秒级时间戳            |
-| duration  |   int    | 运动时长（秒），仅 status=2             |
-|   type    |   int    | 运动类型，见表格 51（十进制数字）       |
-|    id     |   int    | 运动记录 ID，仅 status=2 且读到记录时有 |
+|     **键**     | **类型** | 单位             | **含义**                                                     |
+| :------------: | :------: | :--------------- | ------------------------------------------------------------ |
+|     status     |   int    | -                | 1：运动开始；2：运动结束                                     |
+|   starttime    |   int    | 秒（本地时间戳） | 开始时间，本地时间秒级时间戳                                 |
+|    duration    |   int    | 秒               | 运动时长（秒），**仅 status=2**                              |
+|      type      |   int    | -                | 运动类型，见表格 51（十进制数字）                            |
+|       id       |   int    | 秒（本地时间戳） | 运动记录 ID，取值等于 starttime，**仅 status=2 且读到记录时有** |
+|      data      |  object  | -                | 运动数据，字段随 type 变化，见下表格 51，**仅status=2 且读到记录且类型受支持** |
+|     hr_avg     |   int    | bpm              | 平均心率                                                     |
+|     hr_max     |   int    | bpm              | 最大心率                                                     |
+|     steps      |   int    | 步               | 总步数                                                       |
+|    calories    |   int    | KCal             | 消耗热量（不足 1 取整为 0）                                  |
+|    distance    |   int    | 米               | 总距离                                                       |
+| step_freq_avg  |   int    | 步/分钟          | 平均步频                                                     |
+| step_freq_max  |   int    | 步/分钟          | 最大步频                                                     |
+|  step_len_avg  |  float   | 米               | 平均步长 = distance ÷ steps                                  |
+|    pace_avg    |  float   | 分钟/km          | 平均配速 = duration×1000÷distance÷60                         |
+|    pace_max    |  float   | 分钟/km          | 最快配速，0.00 = 未采集到                                    |
+|  elevation_up  |   int    | 米               | 累计上升高度                                                 |
+| elevation_down |   int    | 米               | 累计下降高度                                                 |
+|   floors_up    |   int    | 层               | 累计上升层数                                                 |
+|  floors_down   |   int    | 层               | 累计下降层数                                                 |
+|   speed_avg    |  float   | km/h             | 平均速度                                                     |
+|   speed_max    |  float   | km/h             | 最大速度                                                     |
 
 表格 51 运动数据格式【sport_cwm/sport_cwm2】格式，轨迹
 
@@ -1079,6 +1096,26 @@ HRV记录5个参数
 |         舞蹈         | 自由训练类 |     5007     |
 | 用户自定义【未启用】 |   自定义   |     9001     |
 
+A. type=1001 远足/ 1002 跑步 / 1003 室内跑步 / 1004 跑步机 —— 共 10 个字段：
+
+hr_avg、hr_max、steps、calories、distance、step_freq_avg、step_freq_max、step_len_avg、pace_avg、pace_max
+
+B. type=1005 登山—— 7 个字段：
+
+​	hr_avg、hr_max、steps、calories、distance、elevation_up、elevation_down
+
+C. type=1006 爬楼 —— 7 个字段： 
+
+​	hr_avg、hr_max、steps、calories、distance、floors_up、floors_down
+
+D. type=3001 户外骑行 / 3002 室内骑行 —— 8 个字段：
+
+hr_avg、hr_max、calories、distance、speed_avg、speed_max、elevation_up、elevation_down
+
+E. type=5001 自由训练 / 5002 网球 / 5003 橄榄球 / 5004 足球 / 5005 篮球 / 5006 力量训练 / 5007 舞蹈 —— 3 个字段：
+
+hr_avg、hr_max、calories
+
 **注释：**
 
 sos, fall_alarm事件上报
@@ -1086,6 +1123,11 @@ sos, fall_alarm事件上报
 1. 当长按按键时终端上报sos事件。
 
 2. 支持跌倒告警的终端检测到跌倒的时候马上上报fall_alarm事件
+
+5. 运动开始（wk_sport_start）	立即上报 {"status":1,"starttime":..,"type":..}
+运动结束（wk_sport_stop）	延迟 500ms 上报 status=2；data 需从 flash 读回记录
+   duration ≥ 5 分钟	记录已存 flash → data 完整
+   duration < 5 分钟	只上报 status/starttime/duration/type，无 data
 
 5. 部分机型sport运动事件会同时上报运动轨迹和5s运动数据[使用原始数据协议上报]，参考:原始数据接口
 
@@ -1102,6 +1144,8 @@ sos, fall_alarm事件上报
    |  2B  | 划水频率 每分钟划水次数 |
    |  1B  | 心率                    |
    |  1B  | 备用                    |
+   
+   
 
 ### 4.6 Wi-Fi信息上报
 
